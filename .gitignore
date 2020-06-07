@@ -1,3 +1,11 @@
+
+# eclipse
+.classpath
+.project
+.factorypath
+.mvn/*
+.settings/*
+
 # Compiled class file
 *.class
 

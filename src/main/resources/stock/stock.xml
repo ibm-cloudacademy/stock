@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+       Copyright 2015-2019 the original author or authors.
+       Licensed under the Apache License, Version 2.0 (the "License");
+       you may not use this file except in compliance with the License.
+       You may obtain a copy of the License at
+          http://www.apache.org/licenses/LICENSE-2.0
+       Unless required by applicable law or agreed to in writing, software
+       distributed under the License is distributed on an "AS IS" BASIS,
+       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+       See the License for the specific language governing permissions and
+       limitations under the License.
+-->
+<!DOCTYPE mapper
+       PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="stock">
+
+    <insert id="saveStock" parameterType="com.ibm.lab.stock.model.Stock">
+        insert into stock (product_id, qty) 
+        values (#{productId}, #{qty})
+        ON CONFLICT (product_id) DO
+        update set qty = #{qty}
+    </insert>
+    
+    <insert id="saveReservedStock" parameterType="com.ibm.lab.stock.model.ReservedStock">
+        insert into reserved_stock (id, status, resources, expires, created) 
+        values (#{id}, #{status}, #{resources}, #{expires}, #{created})
+        ON CONFLICT (id) DO
+        update set status = #{status},
+                   resources = #{resources},
+                   expires = #{expires},
+                   created = #{created}
+    </insert>  
+    
+    <select id="genSeqReservedStock" resultType="Long">
+    	select nextval('seq_reserved_stock')
+    </select>
+    
+    <select id="getSeqReservedStock" resultType="Long" >
+    	select current('seq_reserved_stock')
+    </select>
+    
+     <select id="findById" parameterType="Long" resultType="com.ibm.lab.stock.model.Stock">
+        select id, product_id as productId, qty from stock
+        where id = #{id}
+    </select>
+    
+    <select id="findByProductId" parameterType="Long" resultType="com.ibm.lab.stock.model.Stock">
+        select id, product_id as productId, qty from stock
+        where product_id = #{productId}
+    </select> 
+    
+    <select id="findByProductName" parameterType="String" resultType="com.ibm.lab.stock.model.Stock">
+        select sk.id, sk.product_id as productId, sk.qty from stock sk, product pt
+        where pt.name = #{productName}
+        and   sk.product_id = pt.id
+    </select> 
+    
+     <select id="findAll" parameterType="Long" resultType="com.ibm.lab.stock.model.Stock">
+        select id, product_id as productId, qty from stock
+        limit #{id}
+    </select>
+    
+    
+    <insert id="saveStockOrderHistory" parameterType="com.ibm.lab.stock.model.StockOrderHistory">
+        insert into stock_order_history (product_id, order_id, adjustment_type, qty) 
+        values (#{productId}, #{orderId}, #{adjustmentType}, #{qty})
+        ON CONFLICT (product_id, order_id) DO
+        update set adjustment_type = #{adjustmentType},
+                   qty = #{qty}
+                   
+    </insert> 
+    
+    <select id="getStockOrderHistory" parameterType="String" resultType="com.ibm.lab.stock.model.StockOrderHistory">
+        select soh.product_id as productId, order_id as orderId, adjustment_type as adjustmentType, soh.qty 
+        from stock_order_history soh, product p
+        where order_id = #{orderId}
+        and   p.id = soh.product_id
+    </select> 
+    
+    <select id="findByOrderId" parameterType="String" resultType="com.ibm.lab.stock.model.Stock">
+        select s.id, s.product_id as productId, s.qty 
+        from stock_order_history soh, stock s
+        where soh.order_id = #{orderId}
+        and   s.product_id = soh.product_id      
+    </select> 
+     
+    <select id="findByReservedStockId" parameterType="Long" resultType="com.ibm.lab.stock.model.ReservedStock">
+        select id, status, resources, created, expires from reserved_stock
+        where id = #{id}
+    </select>  
+    
+     <select id="getReservedStock" parameterType="String" resultType="com.ibm.lab.stock.model.ReservedStock">
+        select id, status, resources, created, expires from reserved_stock
+        where order_id = #{orderId}
+    </select> 
+    
+    <delete id="deleteStock" parameterType="Long">
+        delete from stock
+        where id = #{id}
+    </delete>  
+    
+    <delete id="deleteStockByProductId" parameterType="Long">
+        delete from stock
+        where product_id =#{id}
+    </delete>         
+</mapper>  
