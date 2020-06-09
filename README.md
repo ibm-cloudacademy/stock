@@ -11,17 +11,44 @@ Stock/Product Microservice for Cloud Native Post Academy Deep Dive
 ![alt text](img/rest_tcc.png)
 
 ## 필수작업
- 1. iks 배포후 상품정보를 먼저 등록
+ 1. App 관련 작성 규칙
+   username을 기준으로 namespace로 만들고 자신의 앱을 배포하십시요
+```
+   namespace 작성 규칙 : user + NN( 일련번호 2자리)
+   ex)
+    - user01
+    - user02
+        :
+    - user40
+
+   app name 작성 규칙 : user + NN + "-" + post-fix (order|stock|payment  하나 선택)
+   ex)
+    - user01-order
+    - user01-stock
+    - user01-payment
+
+   YAML 파일 규칙 : userNN + appname(order|stock|payment 하나 선택) + ".yaml
+                    userNN + appname-service + ".yaml"
+                    userNN + appname-config + ".yaml"
+   ex)
+    - user01-stock.yaml
+    - user01-stock-service.yaml
+    - user01-stock-config.yaml
+```
+
+ 2. iks 배포후 상품정보를 먼저 등록
 
 ![alt text](img/post_product.png)
 
- 2. postgres db 접속 결과 확인
+ 3. postgres db 접속 결과 확인
 
- 3. kafka topic 조회
+ 4. kafka topic 조회
     kafka topic 정보를 조회합니다.
     kafka 정보
     * kafka name: kafka
     * zookeeper name: kafka-zookeeper
 
- 4. redis 상품정보 조회
+ 5. redis 상품정보 조회
     상품주문 후 사용자가 등록한 상품정보가 캐시된 것을 확인합니다.
+    단. 캐시정보 유지 시간은 3분입니다.
+
